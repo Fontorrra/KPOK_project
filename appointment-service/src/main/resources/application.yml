@@ -1,0 +1,41 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: appointment
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/appointment-db
+    username: team3-db-user
+    password: team3DbPassword
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:/db/changelog.xml
+  kafka:
+    bootstrapServers: localhost:29092
+    topics:
+      topic1: appointment.request.empty_timeframes
+      topic2: appointment.response.empty_timeframes
+      topic3: appointment.request.confirmation
+      topic4: appointment.response.confirmation
+    group:
+      id: groupId
+
+    consumer:
+      auto-offset-reset: earliest
+const:
+  start-time: 9
+  end-time: 18
+  duration-per-patient: 2
+  lunch-start: 13
+  #Номера выходных дней(1-понедельник..7-воскресенье)
+  weekend-days: 1,7
+

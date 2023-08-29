@@ -1,0 +1,65 @@
+version: '2.4'
+
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: team3-db-user
+      POSTGRES_PASSWORD: team3DbPassword
+    ports:
+      - 5432:5432
+    networks:
+      - aboba-network
+
+  zookeeper:
+    container_name: zookeeper
+    image: bitnami/zookeeper:3.8.0-debian-11-r37
+    restart: unless-stopped
+    ports:
+      - 2181:2181
+    volumes:
+      - zookeeper_data:/bitnami
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    networks:
+      - aboba-network
+
+  kafka:
+    container_name: kafka
+    image: bitnami/kafka:3.1.0-debian-10-r106
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CFG_LISTENERS: INTERNAL://:9093,EXTERNAL://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://51.250.22.166:9093,EXTERNAL://51.250.22.166:9092
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_LOG_DIRS: /bitnami/kafka/data
+      KAFKA_LOG_DIR: /opt/bitnami/kafka/logs
+      KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_CFG_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_CFG_LOG_RETENTION_HOURS: 168
+      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    volumes:
+      - kafka_data:/bitnami
+    networks:
+      - aboba-network
+
+networks:
+  aboba-network:
+    name: aboba-network
+    driver: bridge
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
+  db-data:
